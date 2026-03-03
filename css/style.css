@@ -1,0 +1,732 @@
+:root {
+    /* Dark Theme (Default) */
+    --primary: #FFD700;
+    --secondary: #00e676;
+    --error: #ff5252;
+    --bg: #0b0e11;
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.08);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --blob-opacity: 0.1;
+    --win-flash: rgba(0, 230, 118, 0.15);
+    --loss-flash: rgba(255, 82, 82, 0.15);
+}
+
+[data-theme="light"] {
+    --bg: #f5f7fa;
+    --text: #1a1d21;
+    --text-dim: #4a5568;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --border: rgba(0, 0, 0, 0.08);
+    --input-bg: rgba(0, 0, 0, 0.04);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --blob-opacity: 0.15;
+    --win-flash: rgba(0, 230, 118, 0.2);
+    --loss-flash: rgba(255, 82, 82, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Luxury Morphing Coin Background */
+.live-bg-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: var(--bg);
+    overflow: hidden;
+    filter: url('#gooey');
+}
+
+.morphing-coin {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.12;
+    filter: blur(8px) grayscale(1);
+    animation: morphFloat 40s infinite linear;
+}
+
+[data-theme="light"] .morphing-coin {
+    opacity: 0.06;
+    filter: blur(12px) grayscale(1) invert(1);
+}
+
+.coin-1 {
+    top: -10%;
+    left: -10%;
+    background-image: url('../assets/heads.png');
+}
+
+.coin-2 {
+    bottom: -10%;
+    right: -5%;
+    background-image: url('../assets/tails.png');
+    animation-duration: 35s;
+    animation-delay: -5s;
+}
+
+.coin-3 {
+    top: 40%;
+    left: 60%;
+    background-image: url('../assets/heads.png');
+    animation-duration: 50s;
+    animation-delay: -10s;
+}
+
+.coin-4 {
+    bottom: 20%;
+    left: 15%;
+    background-image: url('../assets/tails.png');
+    animation-duration: 45s;
+    animation-delay: -15s;
+}
+
+@keyframes morphFloat {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+
+    33% {
+        transform: translate(10vw, 15vh) rotate(120deg) scale(1.2);
+    }
+
+    66% {
+        transform: translate(-5vw, 25vh) rotate(240deg) scale(0.9);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(360deg) scale(1);
+    }
+}
+
+/* Layout Overhaul */
+.main-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    max-width: 1100px;
+    /* Increased for better spacing */
+    width: 100%;
+    margin: 40px auto;
+    /* Centered */
+    padding: 0 20px;
+}
+
+.stats-sidebar {
+    flex: 1;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 25px 50px -12px var(--shadow);
+    min-width: 320px;
+    /* Solid minimum width */
+    display: none;
+}
+
+.stats-sidebar.active {
+    display: block;
+}
+
+.betting-card {
+    flex: 1.5;
+    max-width: 480px;
+}
+
+/* Overlay Styling */
+.overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+.overlay-screen.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.setup-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+.player-input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.add-btn {
+    width: auto !important;
+    padding: 10px 20px !important;
+}
+
+.player-list-preview {
+    margin: 20px 0;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--input-bg);
+    border-radius: 12px;
+}
+
+.player-tag {
+    display: inline-block;
+    background: var(--primary);
+    color: #000;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.turn-indicator {
+    background: linear-gradient(135deg, var(--primary), #FFA500);
+    color: #000;
+    padding: 12px 28px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-bottom: 25px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 10px 20px -5px rgba(255, 215, 0, 0.4);
+}
+
+#chancesLeft {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    margin-bottom: 30px;
+}
+
+/* Stats Table */
+.stats-container {
+    width: 100%;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 10px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+}
+
+td {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.highlight-row {
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.winner-badge {
+    color: var(--primary);
+    margin-left: 8px;
+    font-weight: 700;
+}
+
+/* Multiplayer Elements (Old - Replacing) */
+
+/* Original Result Animations */
+.win-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+}
+
+.win-overlay.active {
+    display: block;
+    animation: goldenGlow 2s ease-out forwards;
+}
+
+@keyframes goldenGlow {
+    0% {
+        background: radial-gradient(circle, rgba(255, 215, 0, 0) 0%, transparent 70%);
+    }
+
+    20% {
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+    }
+
+    100% {
+        background: radial-gradient(circle, rgba(255, 215, 0, 0) 0%, transparent 70%);
+    }
+}
+
+/* Confetti & Victory Layer */
+.victory-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    top: -20px;
+    border-radius: 2px;
+    will-change: transform;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(calc(100vh + 50px)) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Celebratory Avatar */
+.avatar-celebration {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    width: 250px;
+    height: 250px;
+    z-index: 2000;
+    transform: translateY(400px);
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    will-change: transform;
+}
+
+.avatar-celebration.active {
+    transform: translateY(0);
+}
+
+.avatar-celebration img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+}
+
+.win-effect {
+    animation: winFlash 1s ease-out forwards;
+}
+
+.loss-effect {
+    animation: lossFlash 1s ease-out forwards;
+}
+
+@keyframes winFlash {
+    0% {
+        background-color: var(--bg);
+    }
+
+    50% {
+        background-color: var(--win-flash);
+    }
+
+    100% {
+        background-color: var(--bg);
+    }
+}
+
+@keyframes lossFlash {
+    0% {
+        background-color: var(--bg);
+    }
+
+    50% {
+        background-color: var(--loss-flash);
+    }
+
+    100% {
+        background-color: var(--bg);
+    }
+}
+
+/* Confetti-like Sparkle for Win */
+.sparkle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+    animation: sparkleAnim 1s ease-out forwards;
+}
+
+@keyframes sparkleAnim {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--tw), var(--th)) scale(0);
+        opacity: 0;
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    /* Room for the multiplayer layout */
+    padding: 20px;
+    z-index: 10;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 100;
+}
+
+/* Glass Card */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 25px 50px -12px var(--shadow);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.5;
+}
+
+.balance-container {
+    margin-bottom: 30px;
+}
+
+.balance-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.balance-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Coin Animation */
+.coin-wrapper {
+    perspective: 1000px;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 40px;
+}
+
+#coin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.coin-side {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.coin-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.front {
+    z-index: 2;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+/* Controls */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    margin-left: 12px;
+}
+
+input,
+select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--input-bg);
+    filter: brightness(1.1);
+}
+
+/* Fix for Select Dropdown in Dark Mode */
+select option {
+    background-color: #1a1d21;
+    /* Solid dark background */
+    color: #ffffff;
+    /* White text */
+    padding: 10px;
+}
+
+[data-theme="light"] select option {
+    background-color: #ffffff;
+    color: #1a1d21;
+}
+
+.btn-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+button {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s, filter 0.2s;
+    font-size: 1rem;
+}
+
+#betBtn {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+}
+
+#betBtn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+#betBtn:active {
+    transform: translateY(0);
+}
+
+#betBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.reset-btn {
+    background: var(--input-bg);
+    color: var(--text);
+}
+
+.reset-btn:hover {
+    background: var(--border);
+}
+
+.result {
+    margin-top: 25px;
+    min-height: 28px;
+    line-height: 28px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.result.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.win {
+    color: var(--secondary);
+}
+
+.loss {
+    color: var(--error);
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 992px) {
+    .main-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .stats-sidebar {
+        max-width: 480px;
+        width: 100%;
+        order: 2;
+        /* Move stats below game on mobile */
+    }
+
+    .betting-card {
+        width: 100%;
+        max-width: 480px;
+        order: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .card {
+        padding: 25px 20px;
+    }
+
+    .coin-wrapper {
+        width: 140px;
+        height: 140px;
+    }
+
+    .avatar-celebration {
+        width: 180px;
+        height: 180px;
+        right: 15px;
+    }
+
+    .theme-toggle {
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+    }
+}

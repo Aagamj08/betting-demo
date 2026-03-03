@@ -1,160 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Coin Flip Betting Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: white;
-            text-align: center;
-            padding: 40px;
-        }
-
-        h1 {
-            font-size: 38px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
-            width: 380px;
-            margin: auto;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
-        }
-
-        input, select {
-            padding: 10px;
-            margin: 10px 0;
-            width: 80%;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #00c853;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:disabled {
-            background: gray;
-            cursor: not-allowed;
-        }
-
-        .balance {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .coin {
-            font-size: 60px;
-            margin: 20px 0;
-        }
-
-        .result {
-            margin-top: 15px;
-            font-size: 18px;
-            min-height: 40px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Coin Flip | Premium Betting Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+    <!-- Gooey Filter for Morphing Effect -->
+    <svg style="display:none;">
+        <defs>
+            <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+                    result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </defs>
+    </svg>
 
-    <h1>🎲 Coin Flip Betting Demo</h1>
-    <p>Virtual coins only. 50/50 random logic.</p>
+    <div class="live-bg-container">
+        <div class="morphing-coin coin-1"></div>
+        <div class="morphing-coin coin-2"></div>
+        <div class="morphing-coin coin-3"></div>
+        <div class="morphing-coin coin-4"></div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="Switch Theme">🌙</button>
 
-    <div class="card">
-
-        <div class="balance">
-            Balance: <span id="balance">1000</span> coins
+    <div class="victory-layer" id="victoryLayer">
+        <div id="winOverlay" class="win-overlay"></div>
+        <div id="avatarCelebration" class="avatar-celebration">
+            <img src="assets/avatar.png" alt="Victory!">
         </div>
-
-        <div class="coin" id="coinDisplay">🪙</div>
-
-        <input type="number" id="betAmount" placeholder="Enter bet amount">
-        <br>
-
-        <select id="choice">
-            <option value="Heads">Heads</option>
-            <option value="Tails">Tails</option>
-        </select>
-        <br>
-
-        <button id="betBtn" onclick="placeBet()">Place Bet</button>
-        <button onclick="resetGame()">Reset</button>
-
-        <div class="result" id="result"></div>
     </div>
 
-<script>
-    let balance = 1000;
+    <div class="container">
+        <!-- Setup Overlay -->
+        <div id="setupScreen" class="overlay-screen active">
+            <div class="card setup-card">
+                <h2 style="margin-bottom: 20px; color: var(--primary);">Game Setup</h2>
+                <div class="input-group">
+                    <label>CHANCES PER PLAYER</label>
+                    <input type="number" id="chancesInput" value="3" min="1">
+                </div>
 
-    function placeBet() {
-        let bet = parseInt(document.getElementById("betAmount").value);
-        let choice = document.getElementById("choice").value;
-        let resultDiv = document.getElementById("result");
-        let coinDisplay = document.getElementById("coinDisplay");
-        let betBtn = document.getElementById("betBtn");
+                <div class="input-group">
+                    <label>ADD PLAYERS</label>
+                    <div class="player-input-row">
+                        <input type="text" id="playerNameInput" placeholder="Enter name">
+                        <button class="add-btn" onclick="addPlayer()">+</button>
+                    </div>
+                </div>
 
-        if (!bet || bet <= 0) {
-            resultDiv.innerHTML = "Enter a valid bet amount.";
-            return;
-        }
+                <div id="playerListPreview" class="player-list-preview"></div>
+                <button id="startBtn" onclick="startGame()" style="width: 100%;" disabled>Start Battle</button>
+            </div>
+        </div>
 
-        if (bet > balance) {
-            resultDiv.innerHTML = "Not enough balance.";
-            return;
-        }
+        <header>
+            <h1>Elite Flip</h1>
+            <div class="subtitle">Multiplayer Edition</div>
+        </header>
 
-        betBtn.disabled = true;
-        resultDiv.innerHTML = "Flipping the coin...";
+        <div class="main-layout">
+            <!-- Left Side: Stats (Glass Panel) -->
+            <div id="statsPanel" class="stats-sidebar">
+                <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);">Live Standings</h3>
+                <div class="stats-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Balance</th>
+                                <th>W/L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        // Simulate flipping animation
-        let flips = 0;
-        let flipInterval = setInterval(() => {
-            coinDisplay.innerHTML = Math.random() < 0.5 ? "🟡" : "⚪";
-            flips++;
-            if (flips > 10) {
-                clearInterval(flipInterval);
+            <!-- Center: The Betting Card (The Original UI) -->
+            <div id="gameScreen" class="card betting-card">
+                <div id="currentPlayerDisplay" class="turn-indicator">Waiting...</div>
+                <div id="chancesLeft" class="subtitle">Chances: 0</div>
 
-                let coin = Math.random() < 0.5 ? "Heads" : "Tails";
+                <div class="coin-wrapper">
+                    <div id="coin">
+                        <div class="coin-side front">
+                            <img src="assets/heads.png" alt="Heads">
+                        </div>
+                        <div class="coin-side back">
+                            <img src="assets/tails.png" alt="Tails">
+                        </div>
+                    </div>
+                </div>
 
-                coinDisplay.innerHTML = coin === "Heads" ? "🟡 Heads" : "⚪ Tails";
+                <div class="input-group">
+                    <label>BET AMOUNT</label>
+                    <input type="number" id="betAmount" placeholder="0.00" min="1">
+                </div>
 
-                if (choice === coin) {
-                    balance += bet;
-                    resultDiv.innerHTML = "🎉 It was " + coin + "! You won " + bet + " coins!";
-                } else {
-                    balance -= bet;
-                    resultDiv.innerHTML = "😢 It was " + coin + ". You lost " + bet + " coins.";
-                }
+                <div class="input-group">
+                    <label>YOUR CHOICE</label>
+                    <select id="choice" onchange="updateOpponentChoice()">
+                        <option value="Heads">Heads</option>
+                        <option value="Tails">Tails</option>
+                    </select>
+                    <div id="opponentChoiceLabel"
+                        style="font-size: 0.8rem; color: var(--text-dim); margin-top: 8px; margin-left: 12px;">
+                        Opponent will be: Tails
+                    </div>
+                </div>
 
-                document.getElementById("balance").innerText = balance;
+                <button id="betBtn" onclick="placeBet()" style="width: 100%;">Flip Coin</button>
+                <div class="result" id="result"></div>
+            </div>
+        </div>
 
-                if (balance <= 0) {
-                    resultDiv.innerHTML += "<br>Game Over! Reset to play again.";
-                    betBtn.disabled = true;
-                } else {
-                    betBtn.disabled = false;
-                }
-            }
-        }, 100);
-    }
+        <!-- Final Scoreboard Overlay -->
+        <div id="finalScreen" class="overlay-screen">
+            <div class="card setup-card">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">🏆 Final Rankings</h2>
+                <div id="leaderboard" class="final-scoreboard" style="text-align: left;"></div>
+                <button onclick="resetToSetup()" style="margin-top: 30px; width: 100%;" id="betBtn">New Battle</button>
+            </div>
+        </div>
+    </div>
 
-    function resetGame() {
-        balance = 1000;
-        document.getElementById("balance").innerText = balance;
-        document.getElementById("result").innerHTML = "";
-        document.getElementById("betAmount").value = "";
-        document.getElementById("coinDisplay").innerHTML = "🪙";
-        document.getElementById("betBtn").disabled = false;
-    }
-</script>
-
+    <script src="js/script.js"></script>
 </body>
+
 </html>
