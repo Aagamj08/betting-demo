@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Betting Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 40px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            margin: auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+        }
+
+        input, select {
+            padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #00c853;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #00a844;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .balance {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎲 Coin Flip Betting Demo</h1>
+    <p>Virtual coins only. For learning purposes.</p>
+
+    <div class="card">
+        <div class="balance">
+            Balance: <span id="balance">1000</span> coins
+        </div>
+
+        <input type="number" id="betAmount" placeholder="Enter bet amount">
+        <br>
+
+        <select id="choice">
+            <option value="Heads">Heads</option>
+            <option value="Tails">Tails</option>
+        </select>
+        <br>
+
+        <button onclick="placeBet()">Place Bet</button>
+        <button onclick="resetGame()">Reset</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+<script>
+    let balance = 1000;
+
+    function placeBet() {
+        let bet = parseInt(document.getElementById("betAmount").value);
+        let choice = document.getElementById("choice").value;
+        let resultDiv = document.getElementById("result");
+
+        if (!bet || bet <= 0) {
+            resultDiv.innerHTML = "Enter a valid bet amount.";
+            return;
+        }
+
+        if (bet > balance) {
+            resultDiv.innerHTML = "Not enough balance.";
+            return;
+        }
+
+        let coin = Math.random() < 0.5 ? "Heads" : "Tails";
+
+        if (choice === coin) {
+            balance += bet;
+            resultDiv.innerHTML = "🎉 It was " + coin + "! You won!";
+        } else {
+            balance -= bet;
+            resultDiv.innerHTML = "😢 It was " + coin + ". You lost.";
+        }
+
+        document.getElementById("balance").innerText = balance;
+
+        if (balance <= 0) {
+            resultDiv.innerHTML += "<br>Game Over! Reset to play again.";
+        }
+    }
+
+    function resetGame() {
+        balance = 1000;
+        document.getElementById("balance").innerText = balance;
+        document.getElementById("result").innerHTML = "";
+        document.getElementById("betAmount").value = "";
+    }
+</script>
+
+</body>
+</html>
