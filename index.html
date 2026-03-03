@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Betting Demo</title>
+    <title>Coin Flip Betting Demo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #141e30, #243b55);
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: white;
             text-align: center;
             padding: 40px;
         }
 
         h1 {
-            font-size: 40px;
+            font-size: 38px;
         }
 
         .card {
             background: rgba(255,255,255,0.1);
             padding: 30px;
             border-radius: 15px;
-            width: 350px;
+            width: 380px;
             margin: auto;
-            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
         }
 
         input, select {
@@ -41,30 +41,40 @@
             font-weight: bold;
         }
 
-        button:hover {
-            background: #00a844;
-        }
-
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
+        button:disabled {
+            background: gray;
+            cursor: not-allowed;
         }
 
         .balance {
             font-size: 20px;
             margin-bottom: 15px;
         }
+
+        .coin {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 18px;
+            min-height: 40px;
+        }
     </style>
 </head>
 <body>
 
     <h1>🎲 Coin Flip Betting Demo</h1>
-    <p>Virtual coins only. For learning purposes.</p>
+    <p>Virtual coins only. 50/50 random logic.</p>
 
     <div class="card">
+
         <div class="balance">
             Balance: <span id="balance">1000</span> coins
         </div>
+
+        <div class="coin" id="coinDisplay">🪙</div>
 
         <input type="number" id="betAmount" placeholder="Enter bet amount">
         <br>
@@ -75,7 +85,7 @@
         </select>
         <br>
 
-        <button onclick="placeBet()">Place Bet</button>
+        <button id="betBtn" onclick="placeBet()">Place Bet</button>
         <button onclick="resetGame()">Reset</button>
 
         <div class="result" id="result"></div>
@@ -88,6 +98,8 @@
         let bet = parseInt(document.getElementById("betAmount").value);
         let choice = document.getElementById("choice").value;
         let resultDiv = document.getElementById("result");
+        let coinDisplay = document.getElementById("coinDisplay");
+        let betBtn = document.getElementById("betBtn");
 
         if (!bet || bet <= 0) {
             resultDiv.innerHTML = "Enter a valid bet amount.";
@@ -99,21 +111,39 @@
             return;
         }
 
-        let coin = Math.random() < 0.5 ? "Heads" : "Tails";
+        betBtn.disabled = true;
+        resultDiv.innerHTML = "Flipping the coin...";
 
-        if (choice === coin) {
-            balance += bet;
-            resultDiv.innerHTML = "🎉 It was " + coin + "! You won!";
-        } else {
-            balance -= bet;
-            resultDiv.innerHTML = "😢 It was " + coin + ". You lost.";
-        }
+        // Simulate flipping animation
+        let flips = 0;
+        let flipInterval = setInterval(() => {
+            coinDisplay.innerHTML = Math.random() < 0.5 ? "🟡" : "⚪";
+            flips++;
+            if (flips > 10) {
+                clearInterval(flipInterval);
 
-        document.getElementById("balance").innerText = balance;
+                let coin = Math.random() < 0.5 ? "Heads" : "Tails";
 
-        if (balance <= 0) {
-            resultDiv.innerHTML += "<br>Game Over! Reset to play again.";
-        }
+                coinDisplay.innerHTML = coin === "Heads" ? "🟡 Heads" : "⚪ Tails";
+
+                if (choice === coin) {
+                    balance += bet;
+                    resultDiv.innerHTML = "🎉 It was " + coin + "! You won " + bet + " coins!";
+                } else {
+                    balance -= bet;
+                    resultDiv.innerHTML = "😢 It was " + coin + ". You lost " + bet + " coins.";
+                }
+
+                document.getElementById("balance").innerText = balance;
+
+                if (balance <= 0) {
+                    resultDiv.innerHTML += "<br>Game Over! Reset to play again.";
+                    betBtn.disabled = true;
+                } else {
+                    betBtn.disabled = false;
+                }
+            }
+        }, 100);
     }
 
     function resetGame() {
@@ -121,6 +151,8 @@
         document.getElementById("balance").innerText = balance;
         document.getElementById("result").innerHTML = "";
         document.getElementById("betAmount").value = "";
+        document.getElementById("coinDisplay").innerHTML = "🪙";
+        document.getElementById("betBtn").disabled = false;
     }
 </script>
 
